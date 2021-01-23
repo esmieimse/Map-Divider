@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import datetime
+
 
 # 左辺を決める
 def calcX1(mask, width, height):
@@ -228,3 +230,10 @@ def addSquare(img, series):
             img_grid[y, x, c] = img_grid[y, x, c] * 1.2
   
   return img_grid
+
+
+##画像保存
+def saveImage(img, savepath):
+  now = datetime.datetime.now()
+  filename = savepath + '/' + now.strftime('%Y-%m-%d %H%M%S') + '.png'
+  cv2.imwrite(filename, img)

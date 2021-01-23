@@ -27,15 +27,17 @@ errorMessage1f = sg.Text(size=(15, 1), text_color='red', key='-ERROR1f-')
 errorMessage2s = sg.Text(size=(15, 1), text_color='red', key='-ERROR2s-')
 errorMessage2f = sg.Text(size=(15, 1), text_color='red', key='-ERROR2f-')
 
-checkFill1 = sg.Checkbox('色分け', default=config['OVERLAY']['Fill'], key='-FILL1-')
-checkFill2 = sg.Checkbox('色分け', default=config['OVERLAY']['Fill'], key='-FILL2-')
-checkGrid1 = sg.Checkbox('グリッド', default=config['OVERLAY']['Grid'], key='-GRID1-')
-checkGrid2 = sg.Checkbox('グリッド', default=config['OVERLAY']['Grid'], key='-GRID2-')
-checkSquare1 = sg.Checkbox('マス目(2×2)', default=config['OVERLAY']['Square'], key='-SQUARE1-')
-checkSquare2 = sg.Checkbox('マス目(2×2)', default=config['OVERLAY']['Square'], key='-SQUARE2-')
+checkFill1 = sg.Checkbox('色分け', size=(9,1), default=config['OVERLAY']['Fill'], key='-FILL1-')
+checkFill2 = sg.Checkbox('色分け', size=(9,1), default=config['OVERLAY']['Fill'], key='-FILL2-')
+checkGrid1 = sg.Checkbox('グリッド', size=(9,1), default=config['OVERLAY']['Grid'], key='-GRID1-')
+checkGrid2 = sg.Checkbox('グリッド', size=(9,1), default=config['OVERLAY']['Grid'], key='-GRID2-')
+checkSquare1 = sg.Checkbox('マス目(2×2)', size=(9,1), default=config['OVERLAY']['Square'], key='-SQUARE1-')
+checkSquare2 = sg.Checkbox('マス目(2×2)', size=(9,1), default=config['OVERLAY']['Square'], key='-SQUARE2-')
 
-checkCol1 = [[checkSquare1], [checkGrid1], [checkFill1], [sg.Submit('実行', size=(10,1), key='-SUBMIT1-')]]
-checkCol2 = [[checkSquare2], [checkGrid2], [checkFill2], [sg.Submit('実行', size=(10,1), key='-SUBMIT2-')]]
+checkCol1 = [[checkSquare1], [checkGrid1], [checkFill1], 
+             [sg.Submit('実行', size=(10,1), key='-SUBMIT1-')], [sg.Submit('保存', size=(10,1), disabled = True, key='-SAVE1-')]]
+checkCol2 = [[checkSquare2], [checkGrid2], [checkFill2], 
+             [sg.Submit('実行', size=(10,1), key='-SUBMIT2-')], [sg.Submit('保存', size=(10,1), disabled = True, key='-SAVE2-')]]
 
 Image1 = sg.Image(size=(256,256), pad=((30,10),10), background_color='#d5d8d8', key='-IMAGE1-')
 Image2 = sg.Image(size=(256,256), pad=((30,10),10), background_color='#d5d8d8', key='-IMAGE2-')
@@ -60,10 +62,10 @@ Settings2 = sg.Frame('表示設定',[[sg.Col(Slider2), Reset2]] ,title_color='#3
 
 layoutTab1 = [
   [seriesTitle1, errorMessage1s],
-  [sg.Text('画像フォルダを選択：', pad=((5,0),(5,0))), errorMessage1f],
+  [sg.Text('フォルダを選択：', pad=((5,0),(5,0))), errorMessage1f],
   [sg.InputText(size=(45,1), default_text=config['GENERAL']['FolderPath'], key='-FOLDERPATH-'), sg.FolderBrowse()], 
   [sg.Text('_' * 58, text_color='#aaaaaa')],
-  [sg.Frame('', [[Image1,sg.Col(checkCol1)]], background_color='#d5d8d8', element_justification = "center", pad=((5,5),(5,0)))],
+  [sg.Frame('', [[Image1,sg.Col(checkCol1, element_justification='center')]], background_color='#d5d8d8', element_justification = "center", pad=((5,5),(5,0)))],
   [Settings1]
 ]
 
@@ -72,7 +74,7 @@ layoutTab2 = [
   [sg.Text('画像ファイルを選択：', pad=((5,0),(5,0))), errorMessage2f],
   [sg.InputText(size=(45,1), key='-FILEPATH-'), sg.FileBrowse(file_types=(('Image Files', ['*.png', '*.jpg', '*.jpeg', '*.bmp']),))], 
   [sg.Text('_' * 58, text_color='#aaaaaa')],
-  [sg.Frame('', [[Image2,sg.Col(checkCol2)]], background_color='#d5d8d8', element_justification = "center", pad=((5,5),(5,0)))],
+  [sg.Frame('', [[Image2,sg.Col(checkCol2, element_justification='center')]], background_color='#d5d8d8', element_justification = "center", pad=((5,5),(5,0)))],
   [Settings2]
 ]
 
@@ -86,6 +88,7 @@ window = sg.Window('マップ区画表示ツール', layout, icon=resource_path(
 
 flag1 = False
 flag2 = False
+
 
 while True:
   event, values = window.read()
@@ -118,6 +121,7 @@ while True:
       window['-ERROR1f-'].update('選択してください')
       
     else:
+      window['-ERROR1s-'].update('')
       window['-ERROR1f-'].update('')
       if values['-SERIES1-'] == 'ACWW (DS)':
         series = 'wwds'
@@ -153,12 +157,12 @@ while True:
       else:
         config.set('OVERLAY', 'Grid', '0')
 
-      
-      
+
       img_encode = cv2.imencode('.png', img)[1].tobytes()
       window['-IMAGE1-'].update(data=img_encode)
       window['-SLIDER1a-'].update(disabled = False)
       window['-SLIDER1b-'].update(disabled = False)
+      window['-SAVE1-'].update(disabled = False)
 
 
   ##実行ボタン押したときの処理(Tab2)
@@ -171,6 +175,7 @@ while True:
       window['-ERROR2f-'].update('選択してください')
       
     else:
+      window['-ERROR2s-'].update('')
       window['-ERROR2f-'].update('')
       if values['-SERIES2-'] == 'ACWW (DS)':
         series = 'wwds'
@@ -205,6 +210,7 @@ while True:
       window['-IMAGE2-'].update(data=img_encode)
       window['-SLIDER2a-'].update(disabled = False)
       window['-SLIDER2b-'].update(disabled = False) 
+      window['-SAVE2-'].update(disabled = False)
 
   
   ##スライダー動かしたときの処理(Tab1)
@@ -277,7 +283,40 @@ while True:
     
     img_encode = cv2.imencode('.png', img)[1].tobytes()
     window['-IMAGE2-'].update(data=img_encode)
+  
 
+  ##保存ボタン押したときの処理(Tab1)
+  if event == '-SAVE1-':
+    savepath = config['GENERAL']['SavePath']
+
+    if savepath == '':
+      value = sg.popup_get_folder('保存するフォルダを指定してください')
+      config.set('GENERAL', 'SavePath', value)
+
+      with open('MapDivider.config', 'w') as configfile:
+        config.write(configfile)
+      
+      func.saveImage(img, value)
+
+    else: 
+      func.saveImage(img, savepath)
+
+    
+  ##保存ボタン押したときの処理(Tab2)
+  if event == '-SAVE2-':
+    savepath = config['GENERAL']['SavePath']
+
+    if savepath == '':
+      value = sg.popup_get_folder('保存するフォルダを指定してください')
+      config.set('GENERAL', 'SavePath', value)
+
+      with open('MapDivider.config', 'w') as configfile:
+        config.write(configfile)
+      
+      func.saveImage(img, value)
+
+    else: 
+      func.saveImage(img, savepath)
 
 window.close()
 print(values)
