@@ -178,7 +178,7 @@ def addFill(img, series):
 # 格子
 def addGrid(img, series):
   img_grid = img
-
+  
   if series in {"wwds", "wwvc"}:
     for c in range(3):
       for x in range(63, 256, 64):
@@ -195,3 +195,36 @@ def addGrid(img, series):
   return img_grid
 
 
+# マス目
+def addSquare(img, series):
+  img_grid = img
+
+  if series in {"wwds", "wwvc"}:
+    for c in range(3):
+      for x in range(7, 256, 8):
+        for y in range(256):
+          if (img_grid[x, y, c] * 1.2) > 255:
+            img_grid[x, y, c] = 255
+          else:
+            img_grid[x, y, c] = img_grid[x, y, c] * 1.2
+            
+          if (img_grid[y, x, c] * 1.2) > 255:
+            img_grid[y, x, c] = 255
+          else:
+            img_grid[y, x, c] = img_grid[y, x, c] * 1.2
+
+  elif series in {"cf"}:
+    for c in range(3):
+      for x in range(6, 280, 7):
+        for y in range(280):
+          if (img_grid[x, y, c] * 1.2) > 255:
+            img_grid[x, y, c] = 255
+          else:
+            img_grid[x, y, c] = img_grid[x, y, c] * 1.2
+            
+          if (img_grid[y, x, c] * 1.2) > 255:
+            img_grid[y, x, c] = 255
+          else:
+            img_grid[y, x, c] = img_grid[y, x, c] * 1.2
+  
+  return img_grid

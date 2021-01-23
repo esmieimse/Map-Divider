@@ -31,9 +31,11 @@ checkFill1 = sg.Checkbox('色分け', default=config['OVERLAY']['Fill'], key='-F
 checkFill2 = sg.Checkbox('色分け', default=config['OVERLAY']['Fill'], key='-FILL2-')
 checkGrid1 = sg.Checkbox('グリッド', default=config['OVERLAY']['Grid'], key='-GRID1-')
 checkGrid2 = sg.Checkbox('グリッド', default=config['OVERLAY']['Grid'], key='-GRID2-')
+checkSquare1 = sg.Checkbox('マス目(2×2)', default=config['OVERLAY']['Square'], key='-SQUARE1-')
+checkSquare2 = sg.Checkbox('マス目(2×2)', default=config['OVERLAY']['Square'], key='-SQUARE2-')
 
-checkCol1 = [[checkFill1], [checkGrid1], [sg.Submit('実行', size=(10,1), key='-SUBMIT1-')]]
-checkCol2 = [[checkFill2], [checkGrid2], [sg.Submit('実行', size=(10,1), key='-SUBMIT2-')]]
+checkCol1 = [[checkSquare1], [checkGrid1], [checkFill1], [sg.Submit('実行', size=(10,1), key='-SUBMIT1-')]]
+checkCol2 = [[checkSquare2], [checkGrid2], [checkFill2], [sg.Submit('実行', size=(10,1), key='-SUBMIT2-')]]
 
 Image1 = sg.Image(size=(256,256), pad=((30,10),10), background_color='#d5d8d8', key='-IMAGE1-')
 Image2 = sg.Image(size=(256,256), pad=((30,10),10), background_color='#d5d8d8', key='-IMAGE2-')
@@ -58,7 +60,7 @@ Settings2 = sg.Frame('表示設定',[[sg.Col(Slider2), Reset2]] ,title_color='#3
 
 layoutTab1 = [
   [seriesTitle1, errorMessage1s],
-  [sg.Text('画像ファイルを選択：', pad=((5,0),(5,0))), errorMessage1f],
+  [sg.Text('画像フォルダを選択：', pad=((5,0),(5,0))), errorMessage1f],
   [sg.InputText(size=(45,1), default_text=config['GENERAL']['FolderPath'], key='-FOLDERPATH-'), sg.FolderBrowse()], 
   [sg.Text('_' * 58, text_color='#aaaaaa')],
   [sg.Frame('', [[Image1,sg.Col(checkCol1)]], background_color='#d5d8d8', element_justification = "center", pad=((5,5),(5,0)))],
@@ -133,6 +135,12 @@ while True:
       beta  = values['-SLIDER1b-']
       img = func.createBase(files[0], series, alpha, beta)
 
+      if values['-SQUARE1-'] == True:
+        img = func.addSquare(img, series)
+        config.set('OVERLAY', 'Square', '1')
+      else:
+        config.set('OVERLAY', 'Square', '0')
+
       if values['-FILL1-'] == True:
         img = func.addFill(img, series)
         config.set('OVERLAY', 'Fill', '1')
@@ -144,6 +152,8 @@ while True:
         config.set('OVERLAY', 'Grid', '1')
       else:
         config.set('OVERLAY', 'Grid', '0')
+
+      
       
       img_encode = cv2.imencode('.png', img)[1].tobytes()
       window['-IMAGE1-'].update(data=img_encode)
@@ -173,6 +183,12 @@ while True:
       beta  = values['-SLIDER2b-']
       img = func.createBase(values['-FILEPATH-'], series, alpha, beta)
 
+      if values['-SQUARE2-'] == True:
+        img = func.addSquare(img, series)
+        config.set('OVERLAY', 'Square', '1')
+      else:
+        config.set('OVERLAY', 'Square', '0')
+
       if values['-FILL2-'] == True:
         img = func.addFill(img, series)
         config.set('OVERLAY', 'Fill', '1')
@@ -198,6 +214,8 @@ while True:
     beta  = values['-SLIDER1b-']
     img = func.createBase(files[0], series, alpha, beta)
 
+    if values['-SQUARE1-'] == True:
+      img = func.addSquare(img, series)
     if values['-FILL1-'] == True:
       img = func.addFill(img, series)
     if values['-GRID1-'] == True:
@@ -214,6 +232,8 @@ while True:
     beta  = values['-SLIDER2b-']
     img = func.createBase(values['-FILEPATH-'], series, alpha, beta)
 
+    if values['-SQUARE2-'] == True:
+      img = func.addSquare(img, series)
     if values['-FILL2-'] == True:
       img = func.addFill(img, series)
     if values['-GRID2-'] == True:
@@ -230,6 +250,8 @@ while True:
 
     img = func.createBase(files[0], series)
 
+    if values['-SQUARE1-'] == True:
+      img = func.addSquare(img, series)
     if values['-FILL1-'] == True:
       img = func.addFill(img, series)
     if values['-GRID1-'] == True:
@@ -246,6 +268,8 @@ while True:
     
     img = func.createBase(values['-FILEPATH-'], series)
 
+    if values['-SQUARE2-'] == True:
+      img = func.addSquare(img, series)
     if values['-FILL2-'] == True:
       img = func.addFill(img, series)
     if values['-GRID2-'] == True:
@@ -253,7 +277,6 @@ while True:
     
     img_encode = cv2.imencode('.png', img)[1].tobytes()
     window['-IMAGE2-'].update(data=img_encode)
-
 
 
 window.close()
